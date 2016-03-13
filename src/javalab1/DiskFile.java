@@ -6,6 +6,11 @@
 package javalab1;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -14,6 +19,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,19 +33,20 @@ public class DiskFile implements Serializable, Comparable<DiskFile> {
         Plik;
     }    
     
-    private Set<DiskFile> Files;
+    private Set<DiskFile> files;
     private Date date; 
     private String name;
     private Type type;
-    
+        
     public DiskFile() {        
     }
     
+   
     public DiskFile(String sciezka, int tryb) {
         File file = new File(sciezka);
         
         this.name = file.getName();
-        this.date.setTime(file.lastModified());
+        this.date = new Date(file.lastModified());
         
         if (file.isFile())
              this.type = type.Plik;
@@ -48,39 +56,58 @@ public class DiskFile implements Serializable, Comparable<DiskFile> {
             File[] filesArray = file.listFiles();
             
             if (tryb == 1) {
-                Files = new TreeSet();
+                files = new TreeSet();
+                //tryb = 3;
+                if(filesArray != null)
+                for(File f : filesArray) {
+                    files.add(new DiskFile(f.getAbsolutePath(),tryb) );
+                }
+                
             }
             else if (tryb == 2) {
-                Files = new HashSet();
-            }
+                files = new HashSet();
+                //tryb = 3;
+                
+                for(File f : filesArray) {
+                files.add(new DiskFile(f.getAbsolutePath(),tryb) );                   
+                }                          
+                
+            } 
             
-            for(File f : filesArray) {
-                Files.add(new DiskFile(f.getAbsolutePath(),tryb) );
-                   
-            }
             
+            
+                
             
          }    
         
     }
-    
-    
     public void wypisz() {
+         wypisz(1);
+    }    
+    
+    public void wypisz(int level) {
         
-        System.out.println("-");   
-        System.out.println(this.getName());   
+        for (int n = 0; n < level; n ++)
+            System.out.print("-");   
+        System.out.print(this.getName());   
         
         if (this.getType() == type.Katalog)
-             System.out.println("\tK\t");
+             System.out.print("\t\t\tK\t");
         else
-            System.out.println("\tP\t");
+            System.out.print("\t\t\tP\t");
         
         SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
         String formatedDate = sdf.format(date);
-        System.out.println(formatedDate);        
-        
+        System.out.println(formatedDate);      
+            level ++;
+        if (type.Katalog == this.type) {
+            if(this.files!=null)
+                for(DiskFile f : this.files) { 
+                        f.wypisz(level);                   
+                }            
+        }
     }
-    
+   
     Type getType() {
         return this.type;
     }
@@ -91,11 +118,17 @@ public class DiskFile implements Serializable, Comparable<DiskFile> {
     
      @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.name);
-       // hash = 89 * hash + this.date;
-        return hash;
+        return Objects.hashCode(this.name + this.date);
     }
+    
+    public boolean equals(DiskFile obj) {
+        
+        if (this.upperCaseCounter() == obj.upperCaseCounter())        
+             return true;
+        else
+            return false;
+    }
+    
 
     @Override
     public boolean equals(Object obj) {
@@ -114,19 +147,32 @@ public class DiskFile implements Serializable, Comparable<DiskFile> {
         }
         return true;
     }
+   
+    private int upperCaseCounter() {
+        int numberUpperCase = 0;
+        String string = this.getName();
+        for(int i = 0; i < string.length(); i++) {
+            if (Character.isUpperCase(string.charAt(i)))
+		{
+                    numberUpperCase++;
+		}
+        }
+        return numberUpperCase;
+    }
+    
+    
     
      @Override
     public int compareTo(DiskFile o) {
-        return name.compareTo(o.name);
-    }
-    
-    private void przeszukaj(File dir) {
-        for (File file : dir.listFiles()) {
-            if (file.isDirectory()) {
-                przeszukaj(file);
-            } else {
-                // tu sobie sprawdz czy to poszukiwany plik
+        
+         if (this.upperCaseCounter() > o.upperCaseCounter())
+            {
+                return -1;
             }
-        }
-    }
+            else if(this.upperCaseCounter() < o.upperCaseCounter()){
+                return 1;
+            }
+            else return name.compareTo(o.name);                    
+    }   
+   
 }
