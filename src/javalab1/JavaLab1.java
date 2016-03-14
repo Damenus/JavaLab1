@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import static java.lang.Math.log;
 import static java.lang.StrictMath.log;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +39,7 @@ public class JavaLab1 {
             int tryb = 1;                    
             String sciezka = "tak";
             boolean czyPoprawne = false;
-          /*
+          
             Scanner odczyt = new Scanner(System.in);
             
             
@@ -61,16 +62,20 @@ public class JavaLab1 {
                 }
                 catch (NumberFormatException n) { 
                     System.out.println("Niepoprawne dane!\nWybierz poprawny tryb ");
-                }        
+                }
+                catch (InputMismatchException n) {
+                    System.out.println("Błąd");
+                    break;
+                }
             }
             
             System.out.println("Wybrałeś tryb: " + tryb + ". Dla ścieżki: " + sciezka);
             
             
-          */
+          
         
                        
-            DiskFile file = new DiskFile("D:/", tryb);
+            DiskFile file = new DiskFile(sciezka, tryb);
             File zapisz = new File("D:/tmp.txt");
             
             serialize(file,zapisz);

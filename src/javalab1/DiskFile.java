@@ -72,11 +72,7 @@ public class DiskFile implements Serializable, Comparable<DiskFile> {
                 files.add(new DiskFile(f.getAbsolutePath(),tryb) );                   
                 }                          
                 
-            } 
-            
-            
-            
-                
+            }                                                    
             
          }    
         
@@ -89,12 +85,13 @@ public class DiskFile implements Serializable, Comparable<DiskFile> {
         
         for (int n = 0; n < level; n ++)
             System.out.print("-");   
-        System.out.print(this.getName());   
+        System.out.printf("%-30.30s",this.getName());   
         
+        String k = "K", p = "P";
         if (this.getType() == type.Katalog)
-             System.out.print("\t\t\tK\t");
+             System.out.printf("\t%-20s\t", k);
         else
-            System.out.print("\t\t\tP\t");
+            System.out.printf("\t%-20s\t", p);
         
         SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
         String formatedDate = sdf.format(date);
